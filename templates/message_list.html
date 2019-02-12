@@ -6,6 +6,9 @@
     </head>
 
     <body>
+        {% if deleted_id %}
+        <h3>Message deleted <a href="/message/{{ deleted_id }}/undelete">Undo</a></h3>
+        {% endif %}
         <h1>List of all messages</h1>
 
         {% for message in messages %}

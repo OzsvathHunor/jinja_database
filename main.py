@@ -45,8 +45,9 @@ class ResultHandler(BaseHandler):
 
 class MessageListHandler(BaseHandler):
     def get(self):
+        deleted_id = self.request.get("deleted_id")
         messages = Message.query(Message.deleted == False).fetch()
-        params = {"messages": messages}
+        params = {"messages": messages, "deleted_id": deleted_id}
         return self.render_template("message_list.html", params=params)
 
 
@@ -80,6 +81,13 @@ class DeleteMessageHandler(BaseHandler):
         message = Message.get_by_id(int(message_id))
         message.deleted = True
         message.put()
+        return self.redirect("/message-list?deleted_id=" + message_id)
+
+class UndeleteMessageHandler(BaseHandler):
+    def get(self, message_id):
+        message = Message.get_by_id(int(message_id))
+        message.deleted = False
+        message.put()
         return self.redirect_to("msg-list")
 
 
@@ -90,4 +98,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/message/<message_id:\d+>', MessageDetailsHandler),
     webapp2.Route('/message/<message_id:\d+>/edit', EditMessageHandler),
     webapp2.Route('/message/<message_id:\d+>/delete', DeleteMessageHandler),
+    webapp2.Route('/message/<message_id:\d+>/undelete', UndeleteMessageHandler),
 ], debug=True)
